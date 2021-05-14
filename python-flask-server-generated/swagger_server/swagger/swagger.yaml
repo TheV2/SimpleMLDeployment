@@ -1,0 +1,135 @@
+---
+swagger: "2.0"
+info:
+  description: "This is a simple API"
+  version: "1.0.0"
+  title: "Simple Machine Learning API"
+  contact:
+    email: "wutzkeben@gmail.com"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "virtserver.swaggerhub.com"
+basePath: "/ben.wutzke/MachineLearningTest/1.0.0"
+tags:
+- name: "admins"
+  description: "Secured Admin-only calls"
+- name: "developers"
+  description: "Operations available to regular developers"
+- name: "users"
+  description: "Operations availble to users"
+schemes:
+- "https"
+paths:
+  /train:
+    post:
+      tags:
+      - "developers"
+      summary: "Trains the static model."
+      description: "By passing in training data and options you can train the\nstatic\
+        \ model with new data.  This generates a new model.\n"
+      operationId: "train_model"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "newModelName"
+        in: "query"
+        description: "The name of the new model."
+        required: false
+        type: "string"
+      - in: "body"
+        name: "trainData"
+        description: "Input data for training."
+        required: true
+        schema:
+          type: "array"
+          items:
+            $ref: "#/definitions/UserData"
+      responses:
+        "200":
+          description: "Model succesfully trained."
+        "400":
+          description: "Bad input params."
+      x-swagger-router-controller: "swagger_server.controllers.developers_controller"
+  /predict:
+    get:
+      tags:
+      - "users"
+      summary: "Takes input data from user and runs model for prediction."
+      description: "By passing in data and the desired model name the data is evaluated\
+        \ according\nto the model.\n"
+      operationId: "predict_model"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "modelName"
+        in: "query"
+        description: "The name of the model to use."
+        required: true
+        type: "string"
+      - in: "body"
+        name: "predictData"
+        description: "The data that is to be predicted on.\n"
+        required: true
+        schema:
+          type: "array"
+          items:
+            $ref: "#/definitions/UserData"
+      responses:
+        "200":
+          description: "Prediction succesful."
+        "400":
+          description: "Bad input params."
+      x-swagger-router-controller: "swagger_server.controllers.users_controller"
+definitions:
+  UserData:
+    type: "object"
+    required:
+    - "feature1"
+    - "feature2"
+    - "feature3"
+    properties:
+      feature1:
+        type: "integer"
+        example: 74
+      feature2:
+        type: "integer"
+        example: 210
+      feature3:
+        type: "integer"
+        example: 97
+  InventoryItem:
+    type: "object"
+    required:
+    - "id"
+    - "manufacturer"
+    - "name"
+    - "releaseDate"
+    properties:
+      id:
+        type: "string"
+        format: "uuid"
+        example: "d290f1ee-6c54-4b01-90e6-d701748f0851"
+      name:
+        type: "string"
+        example: "Widget Adapter"
+      releaseDate:
+        type: "string"
+        format: "date-time"
+        example: "2016-08-29T09:12:33.001Z"
+      manufacturer:
+        $ref: "#/definitions/Manufacturer"
+  Manufacturer:
+    required:
+    - "name"
+    properties:
+      name:
+        type: "string"
+        example: "ACME Corporation"
+      homePage:
+        type: "string"
+        format: "url"
+        example: "https://www.acme-corp.com"
+      phone:
+        type: "string"
+        example: "408-867-5309"
